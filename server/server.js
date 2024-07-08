@@ -1,5 +1,7 @@
 const express = require("express");
 require("dotenv").config(); // To access the environment variables
+const path = require("path");
+// const cors = require("cors");
 
 const connectDB = require("./config/dbconfig");
 const userRouter = require("./routes/userRoute");
@@ -9,6 +11,30 @@ const showRouter = require("./routes/showRoute");
 const bookingRouter = require("./routes/bookingRoute");
 
 const app = express();
+// app.use(
+//   cors({
+//     origin: "*", // Allow only your frontend origin
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//     credentials: true, // Allow credentials such as cookies, authorization headers
+//   })
+// );
+app.use(
+  cors({
+    origin: "*", // Allow only your frontend origin
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+const clientBuildPath = path.join(__dirname, "../client/build");
+console.log(clientBuildPath);
+
+app.use(express.static(clientBuildPath));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientBuildPath, "index.html"));
+});
+
 app.use("/api/bookings/verify", express.raw({ type: "application/json" }));
 app.use(express.json());
 connectDB();
